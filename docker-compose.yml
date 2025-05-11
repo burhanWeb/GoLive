@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    image: burhansidiq/go-live-frontend:latest
+    ports:
+      - "5173:5173"
+    command: ["npm", "run", "dev"]
+    depends_on:
+      - server
+    volumes:
+      - ./client:/app
+      - client_node_modules:/app/node_modules
+    env_file:
+      - ./client/.env
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    image: burhansidiq/go-live-backend:latest
+    ports:
+      - "3000:3000"
+    command: ["node", "server.js"]
+    volumes:
+      - ./server:/app
+      - server_node_modules:/app/node_modules
+    env_file:
+      - ./server/.env
+
+volumes:
+  client_node_modules:
+  server_node_modules:
