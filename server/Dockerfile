@@ -9,25 +9,18 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Set the working directory
+# Create app directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json before installing dependencies
-COPY package.json package-lock.json ./
-
-# Install application dependencies
+# Install dependencies (package.json only)
+COPY package*.json ./
 RUN npm install
 
-# Copy the rest of the application code
+# Copy source files
 COPY . .
 
-
-RUN npm ci --only=production
-
-
-
-# Command to run the server with nodemon
-CMD ["node", "server.js"]
-
-# Expose the port the app runs on
+# Expose server port
 EXPOSE 3000
+
+# Start server
+CMD ["node", "server.js"]

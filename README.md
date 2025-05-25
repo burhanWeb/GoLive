@@ -1,12 +1,15 @@
 # GoLive
-A Dockerized full-stack application with NGINX load balancing.
+
+A Dockerized full-stack application
 
 ## Features
-- Frontend: React/Vue/Other
-- Backend: Node.js/Express/Other
-- Load Balancing via NGINX
+
+- Frontend: React
+- Backend: Node.js/Express
 - Docker + Docker Compose
 
 ## Getting Started
+
 ```bash
 docker-compose up --build
+```

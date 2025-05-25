@@ -14,11 +14,6 @@ const io = new SocketIO(server, {
   },
 });
 
-// Add this route for testing NGINX load balancing
-app.get("/", (req, res) => {
-  res.send("Hello from " + process.env.HOSTNAME);
-});
-
 io.on("connection", (socket) => {
   console.log("New client connected", socket.id);
 
