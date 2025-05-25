@@ -13,57 +13,60 @@ const io = new SocketIO(server, {
   },
 });
 
+// Add this route for testing NGINX load balancing
+app.get("/", (req, res) => {
+  res.send("Hello from " + process.env.HOSTNAME);
+});
+
 io.on("connection", (socket) => {
   console.log("New client connected", socket.id);
 
   socket.on("start-stream", ({ rtmpUrl }) => {
     console.log("Received RTMP URL:", rtmpUrl);
 
-    // FFmpeg options for streaming to the RTMP URL
     const options = [
       "-i",
-      "pipe:0", // Read video data from stdin
+      "pipe:0",
       "-c:v",
-      "libx264", // Video codec (H.264)
+      "libx264",
       "-preset",
-      "ultrafast", // Encoding speed
+      "ultrafast",
       "-tune",
-      "zerolatency", // Real-time streaming
+      "zerolatency",
       "-r",
-      "25", // Frame rate
+      "25",
       "-g",
-      "50", // GOP size (2 seconds)
+      "50",
       "-keyint_min",
-      "25", // Minimum GOP size (1 second)
+      "25",
       "-crf",
-      "25", // Constant rate factor (quality)
+      "25",
       "-pix_fmt",
-      "yuv420p", // Pixel format for compatibility
+      "yuv420p",
       "-sc_threshold",
-      "0", // Disable scene cut detection
+      "0",
       "-profile:v",
-      "main", // H.264 profile
+      "main",
       "-level:v",
-      "3.1", // H.264 level
+      "3.1",
       "-c:a",
-      "aac", // Audio codec (AAC)
+      "aac",
       "-ar",
-      "44100", // Audio sample rate
+      "44100",
       "-b:a",
-      "128k", // Audio bitrate
+      "128k",
       "-f",
-      "flv", // Output format (FLV for RTMP)
-      rtmpUrl, // The RTMP URL for the stream
+      "flv",
+      rtmpUrl,
     ];
 
-    // Start the FFmpeg process
     const ffmpeg = spawn("ffmpeg", options);
 
     ffmpeg.stderr.on("data", (data) => {
       console.log(`FFmpeg stderr: ${data}`);
     });
 
-    ffmpeg.stderr.on("error", (err) => {
+    ffmpeg.on("error", (err) => {
       console.error("FFmpeg error:", err);
     });
 
@@ -81,10 +84,14 @@ io.on("connection", (socket) => {
         }
       });
     });
-  });
 
-  socket.on("disconnect", () => {
-    console.log("Client disconnected");
+    socket.on("disconnect", () => {
+      console.log("Client disconnected");
+      if (!ffmpeg.killed) {
+        ffmpeg.stdin.end();
+        ffmpeg.kill("SIGINT");
+      }
+    });
   });
 });
 

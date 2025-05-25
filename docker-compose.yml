@@ -5,31 +5,61 @@ services:
     build:
       context: ./client
       dockerfile: Dockerfile
-    image: burhansidiq/go-live-frontend:latest
     ports:
       - "5173:5173"
     command: ["npm", "run", "dev"]
     depends_on:
-      - server
+      - nginx
     volumes:
       - ./client:/app
       - client_node_modules:/app/node_modules
     env_file:
       - ./client/.env
 
-  server:
-    build:
-      context: ./server
-      dockerfile: Dockerfile
-    image: burhansidiq/go-live-backend:latest
-    ports:
-      - "3000:3000"
+  server1:
+    build: ./server
+    ports: []
+    container_name: server1
     command: ["node", "server.js"]
     volumes:
       - ./server:/app
       - server_node_modules:/app/node_modules
     env_file:
       - ./server/.env
+
+  server2:
+    build: ./server
+    ports: []
+    container_name: server2
+    command: ["node", "server.js"]
+    volumes:
+      - ./server:/app
+      - server_node_modules:/app/node_modules
+    env_file:
+      - ./server/.env
+
+  server3:
+    build: ./server
+    ports: []
+    container_name: server3
+    command: ["node", "server.js"]
+    volumes:
+      - ./server:/app
+      - server_node_modules:/app/node_modules
+    env_file:
+      - ./server/.env
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx-lb
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - server1
+      - server2
+      - server3
 
 volumes:
   client_node_modules:
