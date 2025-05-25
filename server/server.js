@@ -2,12 +2,13 @@ import http from "http";
 import express from "express";
 import { Server as SocketIO } from "socket.io";
 import { spawn } from "child_process";
-
+import dotenv from "dotenv";
+dotenv.config();
 const app = express();
 const server = http.createServer(app);
 const io = new SocketIO(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: CLIENT_URL,
     methods: ["GET", "POST"],
     credentials: true,
   },

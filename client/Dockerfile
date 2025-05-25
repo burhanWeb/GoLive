@@ -18,5 +18,5 @@ RUN npm run build
 # Expose the port that the app will run on
 EXPOSE 3000
 
-# Set the default command to start the server, updating the path to 'server/server.js'
+
 CMD ["npm", "run", "dev"]
